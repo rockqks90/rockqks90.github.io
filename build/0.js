@@ -112,7 +112,7 @@ var ViewPage = /** @class */ (function () {
             if (day == _this.resultVal.payday)
                 _this.setCourse();
             _this.earning.calc = _this.resultVal.salary * (now - _this.lastMonth) / (_this.fastestPayday - _this.lastMonth);
-            var tmp = Number(_this.earning.calc.toFixed(2)).toLocaleString().split('.');
+            var tmp = Number(_this.earning.calc.toFixed(2)).toLocaleString('ko').split('.');
             if (tmp[1] !== undefined) {
                 if (tmp[1].length == 1)
                     tmp[1] += '0';
