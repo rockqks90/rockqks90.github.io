@@ -68,6 +68,8 @@ var ViewPage = /** @class */ (function () {
             show: '0',
             module: '0',
         };
+        /** 마지막 조회 이후로 얼마나 벌었습니다! */
+        this.earnFromLastRefresh = 0;
         if (navParams.get('data') === undefined)
             navCtrl.setRoot(__WEBPACK_IMPORTED_MODULE_2__home_home__["a" /* HomePage */]);
         else {
@@ -85,23 +87,34 @@ var ViewPage = /** @class */ (function () {
             this.setCourse();
         }
     };
+    ViewPage.prototype.ionViewWillEnter = function () {
+        var tmp = localStorage.getItem('lastRefresh');
+        var lastRefresh = new Date().getTime();
+        var now = new Date().getTime();
+        if (tmp || false)
+            lastRefresh = new Date(tmp).getTime();
+    };
     /** 시작점, 끝점 파악하기 */
     ViewPage.prototype.setCourse = function () {
-        var now = new Date().toLocaleDateString('ko');
-        var sep = now.split('.');
-        var sep2 = now.split('.');
-        if (Number(sep[2]) < this.resultVal.payday) {
-            sep[1] = ' ' + (Number(sep[1]) - 1 || 12).toString();
-            sep[2] = ' ' + this.resultVal.payday;
-            sep2[2] = ' ' + this.resultVal.payday;
+        var lastPayday = [new Date().getUTCFullYear(), new Date().getUTCMonth() + 1, this.resultVal.payday];
+        var nextPayday = [new Date().getUTCFullYear(), new Date().getUTCMonth() + 1, this.resultVal.payday];
+        var now = new Date().getUTCDate();
+        if (now < this.resultVal.payday) {
+            lastPayday[1]--;
+            if (!lastPayday[1]) {
+                lastPayday[1] = 12;
+                lastPayday[0]--;
+            }
         }
         else {
-            sep[2] = ' ' + this.resultVal.payday;
-            sep2[1] = ' ' + (Number(sep[1]) + 1 > 13 ? 1 : Number(sep[1]) + 1).toString();
-            sep2[2] = ' ' + this.resultVal.payday;
+            nextPayday[1]++;
+            if (nextPayday[1] > 12) {
+                nextPayday[1] = 1;
+                nextPayday[0]++;
+            }
         }
-        this.lastMonth = new Date(sep.join());
-        this.fastestPayday = new Date(sep2.join());
+        this.lastMonth = new Date(lastPayday.join('-'));
+        this.nextPayday = new Date(nextPayday.join('-'));
     };
     /** 프레임처리 */
     ViewPage.prototype.realtimeRefresh = function () {
@@ -111,7 +124,7 @@ var ViewPage = /** @class */ (function () {
             var day = new Date().getDate();
             if (day == _this.resultVal.payday)
                 _this.setCourse();
-            _this.earning.calc = _this.resultVal.salary * (now - _this.lastMonth) / (_this.fastestPayday - _this.lastMonth);
+            _this.earning.calc = _this.resultVal.salary * (now - _this.lastMonth) / (_this.nextPayday - _this.lastMonth);
             var tmp = Number(_this.earning.calc.toFixed(2)).toLocaleString('ko').split('.');
             if (tmp[1] !== undefined) {
                 if (tmp[1].length == 1)
@@ -133,9 +146,12 @@ var ViewPage = /** @class */ (function () {
             this.resultVal.salary = Math.round(this.resultVal.salary);
         }
     };
+    ViewPage.prototype.setClipBoard = function () {
+        console.log('클립보드에 주소 저장 예정');
+    };
     ViewPage = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({
-            selector: 'page-view',template:/*ion-inline-start:"/home/liss22/real_time_salary/src/pages/view/view.html"*/'<ion-content padding>\n  <div *ngIf="resultVal!==undeifined">\n    <ion-list>\n      <div>\n        당신이 {{resultVal.payday}}일부터 지금까지...\n      </div>\n      <ion-item>\n        <ion-label>이번달에 벌고있는 돈</ion-label>\n        <div item-right style="margin: 0;">{{earning.show}}</div>\n        <div item-right style="margin: 0;font-size: 14px;color: #bbbbbb">.{{earning.module}}</div>\n        <div item-right>원</div>\n      </ion-item>\n    </ion-list>\n    <!-- <ion-list>\n      <div>\n        당신이 마음놓고 할 수 있는...\n      </div>\n      <ion-item>\n        <ion-label>치킨 한 마리</ion-label>\n        <div item-right>{{resultVal.payday}}시간</div>\n      </ion-item>\n    </ion-list> -->\n  </div>\n  <ion-item text-center>이 고통을 친구들과 나누기</ion-item>\n  <ion-item (click)="navCtrl.pop()" text-center>눈물을 머금고 돌아가기</ion-item>\n</ion-content>'/*ion-inline-end:"/home/liss22/real_time_salary/src/pages/view/view.html"*/,
+            selector: 'page-view',template:/*ion-inline-start:"/home/liss22/real_time_salary/src/pages/view/view.html"*/'<ion-content padding>\n  <div *ngIf="resultVal!==undeifined">\n    <ion-list>\n      <div>\n        당신이 {{resultVal.payday}}일부터 지금까지...\n      </div>\n      <ion-item>\n        <ion-label>이번달에 벌고있는 돈</ion-label>\n        <div item-right style="margin: 0;">{{earning.show}}</div>\n        <div item-right style="margin: 0;font-size: 14px;color: #bbbbbb">.{{earning.module}}</div>\n        <div item-right>원</div>\n      </ion-item>\n    </ion-list>\n    <!-- <ion-list>\n      <div>\n        당신이 마음놓고 할 수 있는...\n      </div>\n      <ion-item>\n        <ion-label>치킨 한 마리</ion-label>\n        <div item-right>{{resultVal.payday}}시간</div>\n      </ion-item>\n    </ion-list> -->\n  </div>\n  <ion-item text-center (click)="setClipBoard()">친구들에게 주소 전파</ion-item>\n  <ion-item (click)="navCtrl.pop()" text-center>눈물을 머금고 돌아가기</ion-item>\n</ion-content>'/*ion-inline-end:"/home/liss22/real_time_salary/src/pages/view/view.html"*/,
         }),
         __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["e" /* NavController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* NavParams */]])
     ], ViewPage);
