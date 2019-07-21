@@ -98,6 +98,7 @@ var ViewPage = /** @class */ (function () {
     ViewPage.prototype.setCourse = function () {
         var lastPayday = [new Date().getUTCFullYear(), new Date().getUTCMonth() + 1, this.resultVal.payday];
         var nextPayday = [new Date().getUTCFullYear(), new Date().getUTCMonth() + 1, this.resultVal.payday];
+        console.log('before calc:', lastPayday, nextPayday);
         var now = new Date().getUTCDate();
         if (now < this.resultVal.payday) {
             lastPayday[1]--;
@@ -113,8 +114,15 @@ var ViewPage = /** @class */ (function () {
                 nextPayday[0]++;
             }
         }
-        this.lastMonth = new Date(lastPayday.join('-'));
-        this.nextPayday = new Date(nextPayday.join('-'));
+        if (lastPayday[1] < 10) {
+            lastPayday[1] = '0' + lastPayday[1];
+        }
+        if (nextPayday[1] < 10) {
+            nextPayday[1] = '0' + nextPayday[1];
+        }
+        this.lastPayday = new Date(lastPayday.join('-')).getTime();
+        this.nextPayday = new Date(nextPayday.join('-')).getTime();
+        console.log('result;', this.lastPayday, this.nextPayday);
     };
     /** 프레임처리 */
     ViewPage.prototype.realtimeRefresh = function () {
@@ -124,7 +132,7 @@ var ViewPage = /** @class */ (function () {
             var day = new Date().getDate();
             if (day == _this.resultVal.payday)
                 _this.setCourse();
-            _this.earning.calc = _this.resultVal.salary * (now - _this.lastMonth) / (_this.nextPayday - _this.lastMonth);
+            _this.earning.calc = _this.resultVal.salary * (now - _this.lastPayday) / (_this.nextPayday - _this.lastPayday);
             var tmp = Number(_this.earning.calc.toFixed(2)).toLocaleString('ko').split('.');
             if (tmp[1] !== undefined) {
                 if (tmp[1].length == 1)
