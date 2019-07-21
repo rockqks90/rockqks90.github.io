@@ -77,6 +77,7 @@ var ViewPage = /** @class */ (function () {
     }
     ViewPage.prototype.ionViewDidLoad = function () {
         if (this.resultVal !== undefined) {
+            this.resultVal.salary = Number(this.resultVal.salary);
             if (this.resultVal.payTerm == '연봉') {
                 this.resultVal.salary /= 12;
             }
@@ -86,7 +87,7 @@ var ViewPage = /** @class */ (function () {
     };
     /** 시작점, 끝점 파악하기 */
     ViewPage.prototype.setCourse = function () {
-        var now = new Date().toLocaleDateString();
+        var now = new Date().toLocaleDateString('ko');
         var sep = now.split('.');
         var sep2 = now.split('.');
         if (Number(sep[2]) < this.resultVal.payday) {
